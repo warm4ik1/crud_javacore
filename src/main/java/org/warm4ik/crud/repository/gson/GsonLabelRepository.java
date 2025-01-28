@@ -2,8 +2,7 @@ package org.warm4ik.crud.repository.gson;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import lombok.Builder;
-import org.warm4ik.crud.GenID.IdGenerator;
+import org.warm4ik.crud.generatorID.generatorID;
 import org.warm4ik.crud.model.Label;
 import org.warm4ik.crud.repository.LabelRepository;
 
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class GsonLabelRepository implements LabelRepository, IdGenerator {
+public class GsonLabelRepository implements LabelRepository, generatorID {
     private final String BASE_PATH = "src/main/resources/labels.json";
     private final Gson gson = new Gson();
 

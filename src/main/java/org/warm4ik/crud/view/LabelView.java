@@ -101,6 +101,7 @@ public class LabelView {
         Long id = scanner.nextLong();
         scanner.nextLine();
         labelController.deleteLabel(id);
+        System.out.println("Удаление успешно завершенно.");
     }
 
 }
