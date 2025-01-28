@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import org.warm4ik.crud.generatorID.generatorID;
 import org.warm4ik.crud.model.Label;
 import org.warm4ik.crud.repository.LabelRepository;
+import org.warm4ik.crud.status.Status;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -64,11 +65,13 @@ public class GsonLabelRepository implements LabelRepository, generatorID {
     @Override
     public void deleteById(Long id) {
         List<Label> labels = loadLabels();
-        boolean removed = labels.removeIf(label -> label.getId().equals(id));
-        if (!removed) {
-            System.out.println("Метка с id {" + id + "} не найдена.");
-        }
-        saveAll(labels);
+        labels.stream()
+                .filter(label -> label.getId().equals(id))
+                .findFirst()
+                .ifPresent(label -> {
+                    label.setStatus(Status.DELETED);  // Меняем статус на DELETED
+                    saveAll(labels);  // Сохраняем обновленный список
+                });
     }
 
 

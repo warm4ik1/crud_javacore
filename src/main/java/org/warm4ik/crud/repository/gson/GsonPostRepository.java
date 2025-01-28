@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.warm4ik.crud.model.Post;
 import org.warm4ik.crud.repository.PostRepository;
+import org.warm4ik.crud.status.PostStatus;
 import org.warm4ik.crud.typeDataAdaptor.LocalDateTimeAdapter;
 
 import java.io.FileReader;
@@ -17,7 +18,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class GsonPostRepository implements PostRepository {
     private final String BASE_PATH = "src/main/resources/posts.json";
@@ -37,7 +37,8 @@ public class GsonPostRepository implements PostRepository {
         }
 
         try (FileReader reader = new FileReader(BASE_PATH)) {
-            Type listType = new TypeToken<List<Post>>() {}.getType();
+            Type listType = new TypeToken<List<Post>>() {
+            }.getType();
             List<Post> posts = gson.fromJson(reader, listType);
             return posts == null ? new ArrayList<>() : posts;
         } catch (IOException e) {
@@ -79,7 +80,7 @@ public class GsonPostRepository implements PostRepository {
                 .id(nextId)
                 .content(post.getContent())
                 .labels(post.getLabels() != null ? post.getLabels() : new ArrayList<>())
-                .postStatus(post.getPostStatus())
+                .postStatus(PostStatus.ACTIVE)
                 .created(LocalDateTime.now())
                 .updated(LocalDateTime.now())
                 .build();
@@ -97,7 +98,7 @@ public class GsonPostRepository implements PostRepository {
                         .id(post.getId())
                         .content(post.getContent())
                         .labels(post.getLabels() != null ? post.getLabels() : new ArrayList<>())
-                        .postStatus(post.getPostStatus())
+                        .postStatus(PostStatus.UNDER_REVIEW)
                         .created(posts.get(i).getCreated())
                         .updated(LocalDateTime.now())
                         .build();
@@ -109,11 +110,24 @@ public class GsonPostRepository implements PostRepository {
         return null;
     }
 
-
     @Override
     public void deleteById(Long id) {
         List<Post> posts = loadPosts();
-        posts.removeIf(p -> p.getId() != null && p.getId().equals(id));
-        savePosts(posts);
+        for (int i = 0; i < posts.size(); i++) {
+            Post post = posts.get(i);
+            if (post.getId() != null && post.getId().equals(id)) {
+                Post updatedPost = Post.builder()
+                        .id(post.getId())
+                        .content(post.getContent())
+                        .labels(post.getLabels() != null ? post.getLabels() : new ArrayList<>())
+                        .postStatus(PostStatus.DELETED)
+                        .created(post.getCreated())
+                        .updated(LocalDateTime.now())
+                        .build();
+                posts.set(i, updatedPost);
+                savePosts(posts);
+                return;
+            }
+        }
     }
 }
