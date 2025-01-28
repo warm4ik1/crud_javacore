@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.warm4ik.crud.model.Post;
+import org.warm4ik.crud.model.Label;
 import org.warm4ik.crud.repository.PostRepository;
 import org.warm4ik.crud.status.PostStatus;
 import org.warm4ik.crud.typeDataAdaptor.LocalDateTimeAdapter;
@@ -25,24 +26,26 @@ public class GsonPostRepository implements PostRepository {
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
 
+    // Счётчик только для меток
+    private long labelIdCounter = 1;
+
     private List<Post> loadPosts() {
         Path path = Paths.get(BASE_PATH);
         if (!Files.exists(path)) {
             try {
                 Files.createFile(path);
             } catch (IOException e) {
-                System.err.println("Error creating file: " + e.getMessage());
+                System.err.println("Ошибка при создании файла: " + e.getMessage());
                 return new ArrayList<>();
             }
         }
 
         try (FileReader reader = new FileReader(BASE_PATH)) {
-            Type listType = new TypeToken<List<Post>>() {
-            }.getType();
+            Type listType = new TypeToken<List<Post>>() {}.getType();
             List<Post> posts = gson.fromJson(reader, listType);
             return posts == null ? new ArrayList<>() : posts;
         } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
+            System.err.println("Ошибка чтения файла: " + e.getMessage());
             return new ArrayList<>();
         }
     }
@@ -51,7 +54,7 @@ public class GsonPostRepository implements PostRepository {
         try (FileWriter writer = new FileWriter(BASE_PATH)) {
             gson.toJson(posts, writer);
         } catch (IOException e) {
-            System.err.println("Error writing to file: " + e.getMessage());
+            System.err.println("Ошибка записи в файл: " + e.getMessage());
         }
     }
 
@@ -76,6 +79,16 @@ public class GsonPostRepository implements PostRepository {
                 .mapToLong(Post::getId)
                 .max()
                 .orElse(0) + 1;
+
+        // Генерация ID для меток (если их нет)
+        if (post.getLabels() != null) {
+            for (Label label : post.getLabels()) {
+                if (label.getId() == null) {
+                    label.setId(labelIdCounter++);
+                }
+            }
+        }
+
         Post newPost = Post.builder()
                 .id(nextId)
                 .content(post.getContent())
@@ -84,6 +97,7 @@ public class GsonPostRepository implements PostRepository {
                 .created(LocalDateTime.now())
                 .updated(LocalDateTime.now())
                 .build();
+
         posts.add(newPost);
         savePosts(posts);
         return newPost;
@@ -94,6 +108,16 @@ public class GsonPostRepository implements PostRepository {
         List<Post> posts = loadPosts();
         for (int i = 0; i < posts.size(); i++) {
             if (posts.get(i).getId() != null && posts.get(i).getId().equals(post.getId())) {
+
+                // Генерация ID для меток при обновлении поста (если метки без ID)
+                if (post.getLabels() != null) {
+                    for (Label label : post.getLabels()) {
+                        if (label.getId() == null) {
+                            label.setId(labelIdCounter++);
+                        }
+                    }
+                }
+
                 Post updatedPost = Post.builder()
                         .id(post.getId())
                         .content(post.getContent())
@@ -102,6 +126,7 @@ public class GsonPostRepository implements PostRepository {
                         .created(posts.get(i).getCreated())
                         .updated(LocalDateTime.now())
                         .build();
+
                 posts.set(i, updatedPost);
                 savePosts(posts);
                 return updatedPost;

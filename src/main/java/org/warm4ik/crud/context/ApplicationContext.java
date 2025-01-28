@@ -43,7 +43,7 @@ public class ApplicationContext {
             System.out.println("1. Запустить LabelView");
             System.out.println("2. Запустить PostView");
             System.out.println("3. Запустить WriterView");
-            System.out.println("4. Выход");
+            System.out.println("0. Выход");
             System.out.print("Введите номер действия: ");
             try {
                 int input = scanner.nextInt();
@@ -58,7 +58,7 @@ public class ApplicationContext {
                     case 3:
                         writerView.run();
                         break;
-                    case 4:
+                    case 0:
                         running = false;
                         System.out.println("Выход из программы...");
                         break;

@@ -1,1 +1,17 @@
-[{"id":1,"firstName":"","lastName":"Nikol","status":"ACTIVE","posts":[]},{"id":3,"firstName":"test","lastName":"test","status":"DELETED","posts":[]},{"id":4,"firstName":"1","lastName":"1","status":"ACTIVE","posts":[{"id":1,"content":"1","created":"2025-01-28T18:35:14.8156241","updated":"2025-01-28T18:35:14.8156241","labels":[],"postStatus":"ACTIVE"}]}]
+[
+  {
+    "firstName": "Unknown Author",
+    "id": 1,
+    "lastName": "Secret",
+    "posts": [
+      {
+        "id": 1,
+        "content": "secret_hashcode",
+        "created": "2025-01-28T19:33:55.3881143",
+        "updated": "2025-01-28T19:33:55.3881143",
+        "labels": [],
+        "postStatus": "ACTIVE"
+      }
+    ],
+    "status": "ACTIVE"
+  }]
