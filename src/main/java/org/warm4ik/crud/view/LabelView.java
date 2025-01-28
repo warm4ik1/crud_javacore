@@ -16,7 +16,7 @@ public class LabelView {
         this.scanner = new Scanner(System.in);
     }
 
-    public void start() {
+    public void run() {
         boolean running = true;
         while (running) {
             System.out.println("1. Добавить метку");
