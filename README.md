@@ -1,3 +1,4 @@
+ТЗ:
 Консольное CRUD приложение, которое имеет следующие сущности:
 Writer (id, firstName, lastName, List<Post> posts)
 Post (id, content, created, updated, List<Label> labels)
